@@ -1,11 +1,11 @@
 variable "developer" {
   type    = list(string)
-  default = ["developer","developer1"]
+  #default = ["developer","developer1","developer3"]
 }
 
 variable "admin" {
   type    = list(string)
-  default = ["admin","admin1", "admin2"]
+  #default = ["admin1", "admin2","admin3"]
 }
 
 variable "env" {
