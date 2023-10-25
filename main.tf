@@ -1,14 +1,14 @@
-# developer 
+# developer
 resource "aws_iam_user_login_profile" "Developer_user" {
-  count                   = length(var.developer)
-  user                    = aws_iam_user.developer_eks_user[count.index].name
+  for_each                = toset(var.developer)
+  user                    = aws_iam_user.developer_eks_user[each.key].name
   password_reset_required = true
   pgp_key                 = "keybase:quadribello41"
 }
 
 resource "aws_iam_user" "developer_eks_user" {
-  count         = length(var.developer)
-  name          = element(var.developer, count.index)
+  for_each      = toset(var.developer)
+  name          = each.key
   force_destroy = true
 
   tags = {
@@ -18,15 +18,19 @@ resource "aws_iam_user" "developer_eks_user" {
 
 # admins
 resource "aws_iam_user_login_profile" "Admin_user" {
-  count                   = length(var.admin)
-  user                    = aws_iam_user.admin_eks_user[count.index].name
+  #count                   = length(var.admin)
+  #user                    = aws_iam_user.admin_eks_user[count.index].name
+  for_each                = toset(var.admin)
+  user                    = aws_iam_user.admin_eks_user[each.key].name
   password_reset_required = true
   pgp_key                 = "keybase:quadribello41"
 }
 
 resource "aws_iam_user" "admin_eks_user" {
-  count         = length(var.admin)
-  name          = element(var.admin, count.index)
+  #count         = length(var.admin)
+  #name          = element(var.admin, count.index)
+  for_each      = toset(var.admin)
+  name          = each.key
   force_destroy = true
 
   tags = {
@@ -46,9 +50,11 @@ resource "aws_iam_group_policy" "developer_policy" {
 }
 
 resource "aws_iam_group_membership" "db_team" {
-  count = length(var.developer)
+  #count = length(var.developer)
+  #count = length(aws_iam_user.developer_eks_user)
   name  = "dev-group-membership"
-  users = [aws_iam_user.developer_eks_user[count.index].name]
+  #users = tolist(aws_iam_user.developer_eks_user[*].name)
+  users = [for user in aws_iam_user.developer_eks_user : user.name]
   group = aws_iam_group.eks_developer.name
 }
 
@@ -64,9 +70,11 @@ resource "aws_iam_group_policy" "masters_policy" {
 }
 
 resource "aws_iam_group_membership" "masters_team" {
-  count = length(var.admin)
+  #count = length(var.admin)
+  #count = length(aws_iam_user.admin_eks_user)
   name  = "masters-group-membership"
-  users = [aws_iam_user.admin_eks_user[count.index].name]
+  #users = tolist(aws_iam_user.admin_eks_user[*].name)
+  users = [for user in aws_iam_user.admin_eks_user : user.name]
   group = aws_iam_group.eks_masters.name
 }
 

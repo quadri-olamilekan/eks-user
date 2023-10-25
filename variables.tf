@@ -1,9 +1,11 @@
 variable "developer" {
-  type = list(any)
+  type    = list(string)
+  default = ["developer","developer1"]
 }
 
 variable "admin" {
-  type = list(any)
+  type    = list(string)
+  default = ["admin","admin1", "admin2"]
 }
 
 variable "env" {
