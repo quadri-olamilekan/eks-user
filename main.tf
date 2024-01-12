@@ -3,7 +3,7 @@ resource "aws_iam_user_login_profile" "Developer_user" {
   for_each                = aws_iam_user.developer_eks_user
   user                    = aws_iam_user.developer_eks_user[each.key].name
   password_reset_required = true
-  pgp_key                 = "keybase:quadribello41"
+  pgp_key                 = var.pgp_key
 }
 
 # Admin User Login Profiles
@@ -11,7 +11,7 @@ resource "aws_iam_user_login_profile" "Admin_user" {
   for_each                = aws_iam_user.admin_eks_user
   user                    = aws_iam_user.admin_eks_user[each.key].name
   password_reset_required = true
-  pgp_key                 = "keybase:quadribello41"
+  pgp_key                 = var.pgp_key
 }
 
 # Developer Users
@@ -20,9 +20,7 @@ resource "aws_iam_user" "developer_eks_user" {
   name          = each.key
   force_destroy = true
 
-  tags = {
-    Department = "developer_eks_user"
-  }
+  tags = var.developer_eks_user_tags
 }
 
 # Admin Users
@@ -31,41 +29,39 @@ resource "aws_iam_user" "admin_eks_user" {
   name          = each.key
   force_destroy = true
 
-  tags = {
-    Department = "admin_eks_user"
-  }
+  tags = var.admin_eks_user_tags
 }
 
 # EKS Developer Group
 resource "aws_iam_group" "eks_developer" {
-  name = "Developer"
+  name = var.eks_developer_group
 }
 
 resource "aws_iam_group_policy" "developer_policy" {
-  name   = "developer"
+  name   = var.eks_developer_group
   group  = aws_iam_group.eks_developer.name
   policy = data.aws_iam_policy_document.developer.json
 }
 
 resource "aws_iam_group_membership" "db_team" {
-  name  = "dev-group-membership"
+  name  = var.dev_aws_iam_group_membership_name
   users = [for user in aws_iam_user.developer_eks_user : user.name]
   group = aws_iam_group.eks_developer.name
 }
 
 # EKS Admin Group
 resource "aws_iam_group" "eks_masters" {
-  name = "Masters"
+  name = var.eks_masters_group
 }
 
 resource "aws_iam_group_policy" "masters_policy" {
-  name   = "masters"
+  name   = var.eks_masters_group
   group  = aws_iam_group.eks_masters.name
-  policy = data.aws_iam_policy_document.masters_role.json
+  policy = data.aws_iam_policy_document.admin_role.json
 }
 
 resource "aws_iam_group_membership" "masters_team" {
-  name  = "masters-group-membership"
+  name  = var.admin_aws_iam_group_membership_name
   users = [for user in aws_iam_user.admin_eks_user : user.name]
   group = aws_iam_group.eks_masters.name
 }
@@ -80,8 +76,8 @@ resource "aws_iam_account_password_policy" "strict" {
 }
 
 resource "aws_iam_role" "masters" {
-  name               = "Masters-eks-Role"
-  assume_role_policy = data.aws_iam_policy_document.masters_assume_role.json
+  name               = "admin-eks-Role"
+  assume_role_policy = data.aws_iam_policy_document.admin_assume_role.json
 }
 
 
@@ -91,6 +87,6 @@ resource "aws_iam_role_policy_attachment" "admin_policy" {
 }
 
 resource "aws_iam_policy" "eks_admin" {
-  name   = "eks-masters"
-  policy = data.aws_iam_policy_document.masters.json
+  name   = "eks-admin"
+  policy = data.aws_iam_policy_document.admin.json
 }

@@ -1,22 +1,13 @@
 data "aws_iam_policy_document" "developer" {
   statement {
-    sid    = "AllowDeveloper"
-    effect = "Allow"
-    actions = [
-      "eks:DescribeNodegroup",
-      "eks:ListNodegroups",
-      "eks:DescribeCluster",
-      "eks:ListClusters",
-      "eks:AccessKubernetesApi",
-      "ssm:GetParameter",
-      "eks:ListUpdates",
-      "eks:ListFargateProfiles"
-    ]
+    sid       = "AllowDeveloper"
+    effect    = "Allow"
+    actions   = var.developer_actions
     resources = ["*"]
   }
 }
 
-data "aws_iam_policy_document" "masters" {
+data "aws_iam_policy_document" "admin" {
   statement {
     sid       = "AllowAdmin"
     effect    = "Allow"
@@ -38,7 +29,7 @@ data "aws_iam_policy_document" "masters" {
   }
 }
 
-data "aws_iam_policy_document" "masters_assume_role" {
+data "aws_iam_policy_document" "admin_assume_role" {
   statement {
     sid    = "AllowAccountAssumeRole"
     effect = "Allow"
@@ -53,7 +44,7 @@ data "aws_iam_policy_document" "masters_assume_role" {
   }
 }
 
-data "aws_iam_policy_document" "masters_role" {
+data "aws_iam_policy_document" "admin_role" {
   statement {
     sid    = "AllowMastersAssumeRole"
     effect = "Allow"
@@ -62,7 +53,7 @@ data "aws_iam_policy_document" "masters_role" {
     ]
     #principals {
     #  type        = "AWS"
-    resources = ["arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/Masters-eks-Role"]
+    resources = ["arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/admin-eks-Role"]
     #identifiers = [data.aws_caller_identity.current.account_id]
     # }
   }
