@@ -38,7 +38,7 @@ data "aws_iam_policy_document" "admin_assume_role" {
     ]
     principals {
       type = "AWS"
-      #identifiers = ["arn:aws:iam::${data.aws_caller_identity.current.account_id}:user/manager"]
+
       identifiers = [data.aws_caller_identity.current.account_id]
     }
   }
@@ -51,11 +51,8 @@ data "aws_iam_policy_document" "admin_role" {
     actions = [
       "sts:AssumeRole",
     ]
-    #principals {
-    #  type        = "AWS"
+
     resources = ["arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/admin-eks-Role"]
-    #identifiers = [data.aws_caller_identity.current.account_id]
-    # }
   }
 }
 

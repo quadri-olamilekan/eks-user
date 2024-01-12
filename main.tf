@@ -19,8 +19,7 @@ resource "aws_iam_user" "developer_eks_user" {
   for_each      = toset(var.developer)
   name          = each.key
   force_destroy = true
-
-  tags = var.developer_eks_user_tags
+  tags          = var.developer_eks_user_tags
 }
 
 # Admin Users
@@ -28,8 +27,7 @@ resource "aws_iam_user" "admin_eks_user" {
   for_each      = toset(var.admin)
   name          = each.key
   force_destroy = true
-
-  tags = var.admin_eks_user_tags
+  tags          = var.admin_eks_user_tags
 }
 
 # EKS Developer Group
@@ -79,7 +77,6 @@ resource "aws_iam_role" "masters" {
   name               = "admin-eks-Role"
   assume_role_policy = data.aws_iam_policy_document.admin_assume_role.json
 }
-
 
 resource "aws_iam_role_policy_attachment" "admin_policy" {
   role       = aws_iam_role.masters.name
